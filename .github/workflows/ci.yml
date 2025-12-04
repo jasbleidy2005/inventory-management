@@ -18,12 +18,16 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
+        cache: 'pip'
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pbr
         pip install -r backend/requirements.txt
+    
+    - name: Verify installations
+      run: |
+        pip list | grep -E "pytest|flake8|bandit|coverage"
     
     - name: Run static analysis - Flake8
       run: |
@@ -35,19 +39,21 @@ jobs:
     
     - name: Run unit tests
       run: |
-        pytest tests/unit/ -v
+        pytest tests/unit/ -v --tb=short
     
     - name: Run integration tests
       run: |
-        pytest tests/integration/ -v
+        pytest tests/integration/ -v --tb=short
     
     - name: Run frontend tests
       run: |
-        pytest tests/frontend/ -v
+        pytest tests/frontend/ -v --tb=short
     
-    - name: Generate coverage report
+    - name: Run all tests with coverage
       run: |
-        pytest tests/unit/ tests/integration/ tests/frontend/ --cov=backend --cov-report=term --cov-report=html
+        coverage run -m pytest tests/unit/ tests/integration/ tests/frontend/
+        coverage report -m
+        coverage html
     
     - name: Upload coverage report
       uses: actions/upload-artifact@v4
@@ -55,6 +61,15 @@ jobs:
       with:
         name: coverage-report
         path: htmlcov/
+        retention-days: 30
+    
+    - name: Test summary
+      if: success()
+      run: |
+        echo "=========================================="
+        echo " TEST RESULTS SUMMARY"
+        echo "=========================================="
+        pytest tests/unit/ tests/integration/ tests/frontend/ -v --tb=no --co -q
     
     - name: All tests passed - Print OK
       if: success()
@@ -64,9 +79,9 @@ jobs:
         echo "       ALL TESTS PASSED!"
         echo "=========================================="
         echo ""
-        echo " Unit Tests:        9/9   PASSED"
-        echo " Integration Tests: 6/6   PASSED"
-        echo " Frontend Tests:    6/6   PASSED"
+        echo " Unit Tests:        PASSED"
+        echo " Integration Tests: PASSED"
+        echo " Frontend Tests:    PASSED"
         echo " Static Analysis:   PASSED"
         echo " Security Scan:     PASSED"
         echo " Code Coverage:     Generated"
