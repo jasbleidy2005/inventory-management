@@ -1,0 +1,8 @@
+Flask==2.0.3
+pytest==6.2.4
+pytest-flask==1.2.0
+requests==2.26.0
+flake8==3.9.2
+bandit==1.7.0
+selenium==3.141.0
+pytest-selenium==1.0.0

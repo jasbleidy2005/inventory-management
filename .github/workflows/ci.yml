@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install -r ../requirements-dev.txt
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: |
+          cd tests/unit
+          pytest
+
+      - name: Run integration tests
+        run: |
+          cd tests/integration
+          pytest
+
+      - name: Run end-to-end tests
+        run: |
+          cd tests/e2e
+          pytest
+
+      - name: Run static analysis
+        run: |
+          flake8 backend
+          flake8 frontend
+
+      - name: Print OK
+        run: echo "OK"

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Categories</h1>
+    <form id="category-form">
+        <input type="text" id="category-name" placeholder="Category Name" required>
+        <button type="submit">Add Category</button>
+    </form>
+    <ul id="category-list">
+        <!-- Categories will be dynamically populated here -->
+    </ul>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
