@@ -1,9 +1,9 @@
 # Core Framework
 Flask==2.3.0
-Flask-SQLAlchemy==3.0.0
+Flask-SQLAlchemy==3.0.5
 Flask-CORS==4.0.0
 python-dotenv==1.0.0
-SQLAlchemy==2.0.0
+SQLAlchemy==2.0.23
 requests==2.31.0
 
 # Testing
@@ -17,3 +17,5 @@ selenium==4.15.0
 flake8==6.0.0
 pbr==6.0.0
 bandit==1.7.5
+setuptools>=65.0.0
+wheel>=0.38.0
