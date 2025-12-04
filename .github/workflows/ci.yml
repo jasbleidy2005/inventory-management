@@ -24,6 +24,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r backend/requirements.txt
     
+    - name: Run static analysis - Flake8
+      run: |
+        flake8 backend/ --max-line-length=120 --extend-ignore=W292,W293,E402
+    
+    - name: Run security analysis - Bandit
+      run: |
+        bandit -r backend/ -ll
+    
     - name: Run unit tests
       run: |
         pytest tests/unit/ -v
@@ -37,27 +45,22 @@ jobs:
         pytest tests/frontend/ -v
     
     - name: Install Chrome for E2E
-      run: |
-        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-        sudo apt-get update
-        sudo apt-get install google-chrome-stable
+      uses: browser-actions/setup-chrome@latest
+      with:
+        chrome-version: stable
     
     - name: Run E2E tests
       run: |
         pytest tests/e2e/ -v --headless
     
-    - name: Run static analysis - Flake8
+    - name: Generate coverage report
       run: |
-        flake8 backend/ --max-line-length=120 --extend-ignore=W292,W293,E402
+        pytest tests/ --cov=backend --cov-report=term --cov-report=html
     
-    - name: Run security analysis - Bandit
-      run: |
-        bandit -r backend/ -ll
-    
-    - name: All tests passed
+    - name: All tests passed - Print OK
       run: |
         echo "=========================================="
         echo "       ALL TESTS PASSED!"
         echo "=========================================="
+        echo ""
         echo "OK"
