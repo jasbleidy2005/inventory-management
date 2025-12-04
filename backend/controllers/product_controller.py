@@ -30,7 +30,7 @@ def get_products():
 
 @product_controller.route('/products/<int:product_id>', methods=['GET'])
 def get_product(product_id):
-    product = Product.query.get(product_id)
+    product = db.session.get(Product, product_id)
     if product:
         return jsonify({'id': product.id, 'name': product.name, 'description': product.description,
                        'price': product.price, 'stock': product.stock, 'category_id': product.category_id}), 200
@@ -39,7 +39,7 @@ def get_product(product_id):
 
 @product_controller.route('/products/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
-    product = Product.query.get(product_id)
+    product = db.session.get(Product, product_id)
     if product:
         data = request.get_json()
         product.name = data['name']
@@ -54,7 +54,7 @@ def update_product(product_id):
 
 @product_controller.route('/products/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
-    product = Product.query.get(product_id)
+    product = db.session.get(Product, product_id)
     if product:
         db.session.delete(product)
         db.session.commit()

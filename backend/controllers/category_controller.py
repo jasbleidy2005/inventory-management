@@ -24,7 +24,7 @@ def get_categories():
 
 @category_controller.route('/categories/<int:category_id>', methods=['GET'])
 def get_category(category_id):
-    category = Category.query.get(category_id)
+    category = db.session.get(Category, category_id)
     if category:
         return jsonify({'id': category.id, 'name': category.name}), 200
     return jsonify({'error': 'Category not found'}), 404
@@ -32,7 +32,7 @@ def get_category(category_id):
 
 @category_controller.route('/categories/<int:category_id>', methods=['PUT'])
 def update_category(category_id):
-    category = Category.query.get(category_id)
+    category = db.session.get(Category, category_id)
     if category:
         data = request.get_json()
         category.name = data['name']
@@ -43,7 +43,7 @@ def update_category(category_id):
 
 @category_controller.route('/categories/<int:category_id>', methods=['DELETE'])
 def delete_category(category_id):
-    category = Category.query.get(category_id)
+    category = db.session.get(Category, category_id)
     if category:
         db.session.delete(category)
         db.session.commit()
