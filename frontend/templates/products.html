@@ -1,33 +1,580 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Gestión de Productos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            background: #667eea;
+            color: white;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .message {
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            font-weight: 500;
+            animation: slideDown 0.5s ease;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+
+        .form-container h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .products-list h2 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 32px;
+            text-align: center;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .product-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+        }
+
+        .product-header h3 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .product-body {
+            padding: 20px;
+        }
+
+        .product-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .product-info-item {
+            text-align: center;
+        }
+
+        .product-info-item label {
+            display: block;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .product-info-item span {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .no-products {
+            background: white;
+            padding: 60px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .no-products .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .no-products p {
+            font-size: 18px;
+            color: #999;
+            margin: 10px 0;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+        }
+
+        /* Modal para editar */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .close {
+            font-size: 32px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-    <h1>Product Management</h1>
-    <div>
-        <h2>Create Product</h2>
-        <form id="create-product-form">
-            <input type="text" id="product-name" placeholder="Product Name" required>
-            <input type="text" id="product-description" placeholder="Description" required>
-            <input type="number" id="product-price" placeholder="Price" required>
-            <input type="number" id="product-stock" placeholder="Stock" required>
-            <select id="product-category" required>
-                <option value="">Select Category</option>
-                <!-- Categories will be populated here -->
-            </select>
-            <button type="submit">Add Product</button>
-        </form>
+    <header>
+        <div class="container">
+            <h1>📦 Gestión de Productos</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">🏠 Inicio</a></li>
+                    <li><a href="{{ url_for('categories') }}">📁 Categorías</a></li>
+                    <li><a href="{{ url_for('products') }}" class="active">📦 Productos</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Mensajes Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulario Crear Producto -->
+        <section class="form-container">
+            <h2>➕ Nuevo Producto</h2>
+            <form method="POST" action="{{ url_for('create_product') }}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">📝 Nombre del Producto:</label>
+                        <input type="text" id="name" name="name" required 
+                               placeholder="Ej: Laptop HP">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category_id">📁 Categoría:</label>
+                        <select id="category_id" name="category_id" required>
+                            <option value="">Selecciona una categoría...</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">💰 Precio:</label>
+                        <input type="number" id="price" name="price" step="0.01" required 
+                               placeholder="0.00">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock">📊 Stock:</label>
+                        <input type="number" id="stock" name="stock" required 
+                               placeholder="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">📄 Descripción:</label>
+                    <textarea id="description" name="description" 
+                              placeholder="Descripción detallada del producto..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">✨ Crear Producto</button>
+            </form>
+        </section>
+
+        <!-- Lista de Productos -->
+        <section class="products-list">
+            <h2>📦 Mis Productos ({{ products|length }})</h2>
+            {% if products %}
+                <div class="products-grid">
+                    {% for product in products %}
+                        <div class="product-card">
+                            <div class="product-header">
+                                <h3>{{ product.name }}</h3>
+                                <span class="product-category">
+                                    📁 {{ product.category.name if product.category else 'Sin categoría' }}
+                                </span>
+                            </div>
+                            <div class="product-body">
+                                <p class="product-description">
+                                    {{ product.description if product.description else 'Sin descripción disponible.' }}
+                                </p>
+                                <div class="product-info">
+                                    <div class="product-info-item">
+                                        <label>💰 Precio</label>
+                                        <span>${{ "%.2f"|format(product.price) }}</span>
+                                    </div>
+                                    <div class="product-info-item">
+                                        <label>📊 Stock</label>
+                                        <span>{{ product.stock }}</span>
+                                    </div>
+                                    <div class="product-info-item">
+                                        <label>🆔 ID</label>
+                                        <span>{{ product.id }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Botones de Acción -->
+                                <div class="product-actions">
+                                    <button class="btn btn-edit" onclick="openEditModal({{ product.id }}, '{{ product.name }}', '{{ product.description }}', {{ product.price }}, {{ product.stock }}, {{ product.category_id if product.category_id else 'null' }})">
+                                        ✏️ Editar
+                                    </button>
+                                    <form method="POST" action="{{ url_for('delete_product', product_id=product.id) }}" 
+                                          style="flex: 1; margin: 0;"
+                                          onsubmit="return confirm('¿Estás seguro de eliminar {{ product.name }}?');">
+                                        <button type="submit" class="btn btn-delete">🗑️ Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-products">
+                    <div class="icon">📭</div>
+                    <p><strong>No hay productos registrados aún</strong></p>
+                    <p>¡Crea tu primer producto usando el formulario de arriba!</p>
+                    <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                        💡 Tip: Asegúrate de crear categorías primero
+                    </p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- Modal para Editar Producto -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Editar Producto</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form method="POST" id="editForm">
+                <input type="hidden" id="edit_product_id" name="product_id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit_name">📝 Nombre:</label>
+                        <input type="text" id="edit_name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_category_id">📁 Categoría:</label>
+                        <select id="edit_category_id" name="category_id" required>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_price">💰 Precio:</label>
+                        <input type="number" id="edit_price" name="price" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit_stock">📊 Stock:</label>
+                        <input type="number" id="edit_stock" name="stock" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit_description">📄 Descripción:</label>
+                    <textarea id="edit_description" name="description"></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">💾 Guardar Cambios</button>
+            </form>
+        </div>
     </div>
-    <div>
-        <h2>Product List</h2>
-        <ul id="product-list">
-            <!-- Product items will be populated here -->
-        </ul>
-    </div>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <footer>
+        <p>&copy; 2024 Sistema de Gestión de Inventario | Desarrollado con ❤️</p>
+    </footer>
+
+    <script>
+        function openEditModal(id, name, description, price, stock, categoryId) {
+            document.getElementById('edit_product_id').value = id;
+            document.getElementById('edit_name').value = name;
+            document.getElementById('edit_description').value = description || '';
+            document.getElementById('edit_price').value = price;
+            document.getElementById('edit_stock').value = stock;
+            document.getElementById('edit_category_id').value = categoryId;
+            
+            // Actualizar la acción del formulario
+            document.getElementById('editForm').action = `/products/update/${id}`;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                closeEditModal();
+            }
+        }
+    </script>
 </body>
 </html>
