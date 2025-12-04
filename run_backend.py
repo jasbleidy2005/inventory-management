@@ -28,27 +28,29 @@ except Exception as e:
 try:
     from backend.controllers.category_controller import category_controller
     from backend.controllers.product_controller import product_controller
-    
+
     app.register_blueprint(category_controller)
     app.register_blueprint(product_controller)
     print(" Controllers registered")
 except Exception as e:
     print(f" Error loading controllers: {e}")
 
+
 @app.route('/')
 def index():
     return "Welcome to the Inventory Management API"
+
 
 if __name__ == '__main__':
     print("="*60)
     print(" Backend Server Starting on http://localhost:5000")
     print("="*60 + "\n")
-    
+
     with app.app_context():
         try:
             db.create_all()
             print(" Database tables created")
         except Exception as e:
             print(f"  Database warning: {e}")
-    
-    app.run(host='127.0.0.1', port=5000, debug=True)
+
+    app.run(host='127.0.0.1', port=5000, debug=True)  # nosec B104
