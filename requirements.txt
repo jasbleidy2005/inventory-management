@@ -3,10 +3,11 @@ Flask-SQLAlchemy==3.0.0
 Flask-CORS==4.0.0
 python-dotenv==1.0.0
 SQLAlchemy==2.0.0
+requests==2.31.0
 pytest==7.4.0
 pytest-flask==1.2.0
 pytest-cov==4.1.0
 selenium==4.15.0
 flake8==6.0.0
 bandit==1.7.5
-pbr==5.11.1
+pbr==6.0.0
